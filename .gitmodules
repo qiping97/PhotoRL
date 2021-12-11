@@ -1,0 +1,3 @@
+[submodule "shutter_tarzan"]
+	path = shutter_tarzan
+	url = https://gitlab.com/interactive-machines/shutter/shutter-tarzan.git
