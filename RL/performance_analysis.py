@@ -168,43 +168,62 @@ subpolicy_to_num_positions = {0: 21, 1: 21, 2: 24, 3: 27}
 #data_path = '/home/qz257/Projects/PhotoRL/shutter_tarzan/shutter-tarzan-shutter_rl/shutter_tarzan/rl_data_temp_updated/'
 #output_path = 'Q_table.json'
 
-#data_path = '/home/aon7/tarzan_ws/src/shutter-tarzan/shutter_tarzan/rl_data_all/'
-data_path = '/home/aon7/tarzan_ws/src/shutter-tarzan/shutter_tarzan/rl_data_test_uniform_policy/'
+data_path = '/home/aon7/tarzan_ws/src/shutter-tarzan/shutter_tarzan/rl_data_all/'
+#data_path = '/home/aon7/tarzan_ws/src/shutter-tarzan/shutter_tarzan/rl_data_test_uniform_policy/'
 
 
 episodes = load_episodes_from_logs(data_path)
-rewards = np.zeros((len(episodes), 9))
-rewards = []
+#rewards = np.zeros((len(episodes), 9))
+rewards_photo = []
+rewards_interaction = []
 #print("episodes", episodes)
 #print(episodes[0])
 #print(len(episodes))
 for i, episode in enumerate(episodes):
     #print("ep = ", episode)
-    curr_rewards = []#np.zeros((9))
-    for state, action, reward in episode:
+    curr_rewards_photo = []#np.zeros((9))
+    for j, (state, action, reward) in enumerate(episode):
         if action == 100:
-            curr_rewards.append(reward)
-    rewards += curr_rewards
+            curr_rewards_photo.append(reward[:5])
+        #print("j", j)
+        if not (np.array(reward[5:]) == 0).all():#j == len(episode)-1:
+            #print("adding rew = ", reward[5:])
+            rewards_interaction += [reward[5:]]
+    rewards_photo += curr_rewards_photo
+    #rewards_interaction += episode[-1][2][6:]
     #print("rewards = ", rewards)
     
-rewards = np.array(rewards)
-print("Rewards shape =", rewards.shape)
-print("Avg rewards = ", np.mean(rewards, axis=0))
-print("Std rewards = ", np.std(rewards, axis=0))
+#print("rewards interaction", rewards_interaction)
+rewards_photo = np.array(rewards_photo)
+rewards_interaction = np.array(rewards_interaction)
 
+print("\nFor each photo-taking step:")
+print("Rewards shape =", rewards_photo.shape)
+print("Avg rewards = ", np.mean(rewards_photo, axis=0))
+print("Std rewards = ", np.std(rewards_photo, axis=0))
 
+print("\nFor each interaction:")
+print("Rewards shape =", rewards_interaction.shape)
+print("Avg rewards = ", np.mean(rewards_interaction, axis=0))
+print("Std rewards = ", np.std(rewards_interaction, axis=0))
 
 
 ''' 
-Rewards shape = (144,9)
 Result for rl_data_all:
-Avg rewards =  [-0.97222222 -0.84722222 -1.34027778 -1.34027778 -1.26388889  0.15972222 0.09027778  0.22222222 -0.13194444]
-Std rewards =  [3.06400347 1.88679418 1.77624446 1.65060256 1.73199512 0.67353952 0.58823175 0.75869446 0.58030796]
+
 
 Result for rl_data_test_uniform_policy
-Rewards shape = (9, 9)
-Avg rewards =  [0.88888889 0.55555556 0.77777778 0.77777778 0.77777778 0.55555556 0.55555556 0.55555556 0.33333333]
-Std rewards =  [1.19670329 1.34256066 1.68508343 1.3146844  1.74977953 0.83147942 0.83147942 0.83147942 0.66666667]
+For each photo-taking step:
+Rewards shape = (9, 5)
+Avg rewards =  [0.88888889 0.55555556 0.77777778 0.77777778 0.77777778]
+Std rewards =  [1.19670329 1.34256066 1.68508343 1.3146844  1.74977953]
+
+For each interaction:
+Rewards shape = (3, 4)
+Avg rewards =  [1.66666667 1.66666667 1.66666667 1.        ]
+Std rewards =  [0.47140452 0.47140452 0.47140452 0.81649658]
+
+
 '''
 
 
