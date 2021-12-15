@@ -153,6 +153,8 @@ def mc_control_importance_sampling(episodes, discount_factor=1.0):
                 # This also improves our target policy which holds a reference to Q
                 Qs[i_reward][state][action] += (W / Cs[i_reward][state][action]) * (G - Qs[i_reward][state][action])
 
+                target_policy = create_greedy_policy(Qs[i_reward])
+
                 # If the action taken by the behavior policy is not the action 
                 # taken by the target policy the probability will be 0 and we can break
                 if action !=  np.argmax(target_policy(state)):
@@ -162,7 +164,13 @@ def mc_control_importance_sampling(episodes, discount_factor=1.0):
     return Qs
 
 subpolicy_to_num_positions = {0: 21, 1: 21, 2: 24, 3: 27}
-data_path = '/home/qz257/Projects/PhotoRL/shutter_tarzan/shutter-tarzan-shutter_rl/shutter_tarzan/rl_data_temp_updated/'
+
+#data_path = '/home/qz257/Projects/PhotoRL/shutter_tarzan/shutter-tarzan-shutter_rl/shutter_tarzan/rl_data_temp_updated/'
+#output_path = 'Q_table.json'
+
+data_path = '/home/aon7/tarzan_ws/src/shutter-tarzan/shutter_tarzan/rl_data_all/'
+output_path = 'Q_table_all_data2.json'
+
 episodes = load_episodes_from_logs(data_path)
 Qs = mc_control_importance_sampling(episodes)
 
@@ -174,5 +182,5 @@ for i in range(len(Qs)):
         Q_json[str(key)] = list(value)
     Qs_json.append(Q_json)
 
-with open('Q_table.json', 'w') as outfile:
+with open(output_path, 'w') as outfile:
     json.dump(Qs_json, outfile)
